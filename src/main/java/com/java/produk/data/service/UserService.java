@@ -15,14 +15,15 @@ import java.util.UUID;
 @Service
 public class UserService {
     @Autowired
-    UserRepository productRepository;
+    UserRepository userRepository;
 
     public User createFromDto(UserDto dto) throws Throwable {
         try {
             User entity = new User();
             BeanUtils.copyProperties(dto, entity);
             entity.setCreatedDate(new Date());
-            productRepository.save(entity);
+            entity.setStatus(true);
+            userRepository.save(entity);
             return entity;
         } catch (Throwable var5) {
             Throwable $ex = var5;
@@ -32,7 +33,7 @@ public class UserService {
 
     public Optional<User> get(UUID id) throws Throwable {
         try {
-            return productRepository.findById(id);
+            return userRepository.findById(id);
         } catch (Throwable var3) {
             Throwable $ex = var3;
             throw $ex;
@@ -43,10 +44,10 @@ public class UserService {
         try {
             User entity = new User();
             if(get(id).isPresent()){
-                entity = productRepository.findById(id).get();
+                entity = userRepository.findById(id).get();
                 BeanUtils.copyProperties(dto, entity);
                 entity.setUpdatedDate(new Date());
-                return productRepository.save(entity);
+                return userRepository.save(entity);
             }else{
                 throw new VascommException("not found");
             }
@@ -60,8 +61,9 @@ public class UserService {
         try {
             User entity = new User();
             if(get(id).isPresent()) {
-                entity = productRepository.findById(id).get();
-                productRepository.delete(entity);
+                entity = userRepository.findById(id).get();
+                entity.setStatus(false);
+                userRepository.save(entity);
                 return entity;
             }else {
                 throw new VascommException("data not found");
