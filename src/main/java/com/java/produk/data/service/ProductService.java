@@ -6,6 +6,9 @@ import com.java.produk.data.model.dto.ProductDto;
 import com.java.produk.data.repository.ProductRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -73,4 +76,10 @@ public class ProductService {
             throw $ex;
         }
     }
+    public Page<Product> getProducts(int page, int limit,String search){
+        int offset = (page - 1) * limit;
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        return productRepository.findByNameContainingIgnoreCase(search, pageable);
+    }
+
 }
