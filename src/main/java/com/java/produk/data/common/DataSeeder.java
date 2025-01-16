@@ -33,6 +33,12 @@ public class DataSeeder implements CommandLineRunner {
         roleAdm.setDescription("");
         roleRepository.save(roleAdm);
 
+        Role roleUser = new Role();
+        roleUser.setRole(Group.ROLE_USER);
+        roleUser.setDescription("");
+        roleRepository.save(roleUser);
+
+
         Set<Role> roles = new HashSet<>();
         roles.add(roleAdm);
 
@@ -41,7 +47,16 @@ public class DataSeeder implements CommandLineRunner {
         admin.setPassword("adminpass");
         admin.setStatus(true);
         admin.setRoles(roles);
+        userRepository.save(admin);
 
+        Set<Role> roleU = new HashSet<>();
+        roleU.add(roleUser);
+
+        User user = new User();
+        user.setUserName("user");
+        user.setPassword("userpass");
+        user.setStatus(true);
+        user.setRoles(roleU);
         userRepository.save(admin);
 
         Product produk = new Product();
