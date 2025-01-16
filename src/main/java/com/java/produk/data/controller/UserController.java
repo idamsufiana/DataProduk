@@ -21,6 +21,7 @@ public class UserController extends BaseController{
     @Autowired
     UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public Object Get(@PathVariable UUID id) throws Throwable {
         Optional<User> user = userService.get(id);
@@ -32,22 +33,26 @@ public class UserController extends BaseController{
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/update/{id}")
     public Object Update(@PathVariable UUID id, @RequestBody UserDto dto) throws Throwable {
         return success(userService.update(id, dto));
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public Object add(@RequestBody UserDto dto) throws Throwable {
         return success(userService.createFromDto(dto));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public Object add(@PathVariable UUID id) throws Throwable {
         return success(userService.delete(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
     public ResponseEntity<Object> getProducts(
             @RequestParam(value = "take", defaultValue = "10") int take,
