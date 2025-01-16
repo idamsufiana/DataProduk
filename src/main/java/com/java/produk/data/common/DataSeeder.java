@@ -62,7 +62,8 @@ public class DataSeeder implements CommandLineRunner {
         Product produk = new Product();
         produk.setName("Produk A");
         produk.setDescription("Deskripsi Produk A");
-        produk.setPrice(100.0);
+        produk.setPrice(100000.0);
+        produk.setStock(500);
         produkRepository.save(produk);
     }
 }
