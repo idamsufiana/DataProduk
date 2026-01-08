@@ -1,9 +1,8 @@
 package com.java.produk.data.config;
 
-import com.java.produk.data.config.security.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,35 +10,41 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/products/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**")
+                        .hasAuthority("SCOPE_read:products")
+                        .requestMatchers(HttpMethod.POST, "/api/products/**")
+                        .hasAuthority("SCOPE_write:products")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**")
+                        .hasAuthority("SCOPE_write:products")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**")
+                        .hasAuthority("SCOPE_delete:products")
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth ->
-                        oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter()))
+                        oauth.authenticationEntryPoint(
+                                new BearerTokenAuthenticationEntryPoint()
+                        )
                 );
+
 
         return http.build();
     }
 
-    private JwtAuthenticationConverter jwtAuthConverter() {
-        JwtGrantedAuthoritiesConverter scopes = new JwtGrantedAuthoritiesConverter();
-        scopes.setAuthorityPrefix("SCOPE_");
-        scopes.setAuthoritiesClaimName("scope");
-
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(scopes);
-        return converter;
-    }
 }
