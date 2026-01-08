@@ -35,7 +35,7 @@ public class ProdukController extends BaseController{
     }
 
     @PreAuthorize("hasRole('ADMIN','USER')")
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public Object Update(@PathVariable UUID id, @RequestBody ProductDto dto) throws Throwable {
         return success(productService.update(id, dto));
 
